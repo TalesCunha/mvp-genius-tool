@@ -2,11 +2,11 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { User, Star } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { User, Star, ArrowLeft } from 'lucide-react';
 
 const Profile = () => {
+  const navigate = useNavigate();
   const userMVPs = [
     {
       id: 1,
@@ -32,6 +32,17 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
+      <div className="fixed top-0 left-0 p-4 z-50">
+        <Button 
+          variant="outline" 
+          className="bg-white/80 backdrop-blur-sm"
+          onClick={() => navigate('/feed')}
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Voltar
+        </Button>
+      </div>
+
       <div className="container px-4 py-8">
         <div className="flex items-center gap-4 mb-8">
           <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">

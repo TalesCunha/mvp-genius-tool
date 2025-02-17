@@ -2,10 +2,12 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Plus } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { TrendingUp, Plus, User, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
 const Feed = () => {
+  const navigate = useNavigate();
   const mockMVPs = [
     {
       id: 1,
@@ -36,18 +38,31 @@ const Feed = () => {
     }
   ];
 
+  const handleLogout = () => {
+    toast({
+      title: "Logout realizado",
+      description: "Você foi desconectado com sucesso"
+    });
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
+      {/* Header with Profile and Logout buttons */}
+      <div className="fixed top-0 right-0 p-4 z-50 flex gap-2">
+        <Button asChild variant="outline" className="bg-white/80 backdrop-blur-sm">
+          <Link to="/profile">
+            <User className="w-4 h-4 mr-2" />
+            Perfil
+          </Link>
+        </Button>
+        <Button variant="outline" className="bg-white/80 backdrop-blur-sm" onClick={handleLogout}>
+          <LogOut className="w-4 h-4 mr-2" />
+          Sair
+        </Button>
+      </div>
+
       <div className="container px-4 py-8">
-        <div className="mb-6">
-          <Button asChild className="flex items-center gap-2">
-            <Link to="/create-mvp">
-              <Plus className="w-4 h-4" />
-              Adicionar Postagem
-            </Link>
-          </Button>
-        </div>
-        
         <div className="flex gap-8">
           {/* Main Feed */}
           <div className="flex-1 space-y-6">
@@ -83,6 +98,14 @@ const Feed = () => {
             </div>
           </div>
         </div>
+
+        {/* Floating Add Button */}
+        <Button asChild size="sm" className="fixed bottom-6 right-6 shadow-lg">
+          <Link to="/create-mvp">
+            <Plus className="w-4 h-4 mr-2" />
+            Adicionar
+          </Link>
+        </Button>
       </div>
     </div>
   );
