@@ -2,7 +2,8 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Feed = () => {
   const mockMVPs = [
@@ -38,6 +39,15 @@ const Feed = () => {
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
       <div className="container px-4 py-8">
+        <div className="mb-6">
+          <Button asChild className="flex items-center gap-2">
+            <Link to="/create-mvp">
+              <Plus className="w-4 h-4" />
+              Adicionar Postagem
+            </Link>
+          </Button>
+        </div>
+        
         <div className="flex gap-8">
           {/* Main Feed */}
           <div className="flex-1 space-y-6">

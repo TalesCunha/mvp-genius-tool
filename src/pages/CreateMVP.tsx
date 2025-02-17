@@ -1,132 +1,127 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Calendar } from '@/components/ui/calendar';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-
-const steps = [
-  {
-    id: 1,
-    title: "Qual problema seu MVP resolve?",
-    type: "text",
-    placeholder: "Descreva o problema que seu MVP pretende solucionar...",
-  },
-  {
-    id: 2,
-    title: "Quem é seu público-alvo?",
-    type: "select",
-    options: ["Startups", "Empresas", "Consumidores Finais", "Estudantes"],
-  },
-  {
-    id: 3,
-    title: "Recursos essenciais",
-    type: "checkbox",
-    options: ["Login/Cadastro", "Pagamentos", "Chat", "Geolocalização", "Notificações"],
-  },
-  {
-    id: 4,
-    title: "Prazo para validação",
-    type: "calendar",
-  },
-  {
-    id: 5,
-    title: "Nome do MVP",
-    type: "text",
-    placeholder: "Digite um nome para seu MVP...",
-  },
-];
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/hooks/use-toast';
 
 const CreateMVP = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const progress = (currentStep / steps.length) * 100;
+  const navigate = useNavigate();
+  const [step, setStep] = useState(1);
 
-  const handleNext = () => {
-    if (currentStep < steps.length) {
-      setCurrentStep(currentStep + 1);
-    }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast({
+      title: "Sucesso!",
+      description: "MVP publicado com sucesso.",
+    });
+    navigate('/feed');
   };
-
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const currentQuestion = steps[currentStep - 1];
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16">
-      <div className="container max-w-2xl px-4 py-8">
-        <div className="space-y-8">
-          <div className="space-y-2">
-            <h2 className="text-2xl font-semibold text-center">
-              {currentQuestion.title}
-            </h2>
-            <Progress value={progress} className="w-full" />
-          </div>
-
-          <div className="bg-white rounded-lg p-8 shadow-sm">
-            {currentQuestion.type === "text" && (
-              <Input
-                placeholder={currentQuestion.placeholder}
-                className="w-full"
-              />
-            )}
-
-            {currentQuestion.type === "select" && (
-              <div className="space-y-4">
-                {currentQuestion.options?.map((option) => (
-                  <div key={option} className="flex items-center space-x-2">
-                    <Checkbox id={option} />
-                    <label htmlFor={option} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      {option}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {currentQuestion.type === "checkbox" && (
-              <div className="space-y-4">
-                {currentQuestion.options?.map((option) => (
-                  <div key={option} className="flex items-center space-x-2">
-                    <Checkbox id={option} />
-                    <label htmlFor={option} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      {option}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {currentQuestion.type === "calendar" && (
-              <div className="flex justify-center">
-                <Calendar
-                  mode="single"
-                  className="rounded-md border"
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="container max-w-3xl px-4">
+        <Card className="p-6">
+          <h1 className="text-2xl font-bold mb-6">Publicar Novo MVP</h1>
+          
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">1. Contexto do MVP</h2>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  O que é o MVP?
+                </label>
+                <Textarea 
+                  placeholder="Descreva brevemente seu produto ou serviço..."
+                  className="min-h-[100px]"
                 />
               </div>
-            )}
-          </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Qual problema ele resolve?
+                </label>
+                <Textarea 
+                  placeholder="Explique o objetivo do MVP..."
+                  className="min-h-[100px]"
+                />
+              </div>
+            </div>
 
-          <div className="flex justify-between">
-            <Button
-              variant="outline"
-              onClick={handlePrevious}
-              disabled={currentStep === 1}
-            >
-              Anterior
-            </Button>
-            <Button
-              onClick={handleNext}
-              disabled={currentStep === steps.length}
-            >
-              {currentStep === steps.length ? "Finalizar" : "Próximo"}
-            </Button>
-          </div>
-        </div>
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">2. Instruções de Uso</h2>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  O que o usuário deve fazer?
+                </label>
+                <Textarea 
+                  placeholder="Forneça instruções claras..."
+                  className="min-h-[100px]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Passo a passo
+                </label>
+                <Textarea 
+                  placeholder="Liste os passos necessários..."
+                  className="min-h-[100px]"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">3. Limitações do MVP</h2>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  O que está pronto?
+                </label>
+                <Textarea 
+                  placeholder="Descreva o estado atual do MVP..."
+                  className="min-h-[100px]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Funcionalidades disponíveis
+                </label>
+                <Textarea 
+                  placeholder="Liste as funcionalidades..."
+                  className="min-h-[100px]"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">4. Objetivo do Teste</h2>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  O que você espera do usuário?
+                </label>
+                <Textarea 
+                  placeholder="Descreva suas expectativas..."
+                  className="min-h-[100px]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Critérios de avaliação
+                </label>
+                <Textarea 
+                  placeholder="Liste os critérios..."
+                  className="min-h-[100px]"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-6">
+              <Button type="submit">
+                Publicar MVP
+              </Button>
+            </div>
+          </form>
+        </Card>
       </div>
     </div>
   );
