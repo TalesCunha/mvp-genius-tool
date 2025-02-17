@@ -1,15 +1,11 @@
 
 import React from 'react';
-import Navbar from '../components/Navbar';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      
-      {/* Hero Section */}
       <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-50/90" />
@@ -26,7 +22,7 @@ const Index = () => {
               Transforme seu MVP em um produto global.
             </p>
             <Button asChild size="lg" className="mt-8">
-              <Link to="/create-mvp">
+              <Link to="/auth">
                 Começar Agora
               </Link>
             </Button>
