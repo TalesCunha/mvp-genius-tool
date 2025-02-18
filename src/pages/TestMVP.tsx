@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, MessageSquarePlus, ExternalLink } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
 const TestMVP = () => {
   const navigate = useNavigate();
@@ -16,6 +17,20 @@ const TestMVP = () => {
     limitations: "- Pagamento simulado apenas com cartão de crédito\n- Disponível apenas em inglês no momento\n- Entregas simuladas em Mumbai",
     objectives: "- Validar a usabilidade do processo de pedido\n- Avaliar a clareza das informações dos restaurantes\n- Testar a eficiência do sistema de filtros",
     testLink: "https://exemplo.com/mvp-delivery"
+  };
+
+  const handleAddFeedback = () => {
+    toast({
+      title: "Em breve!",
+      description: "A funcionalidade de adicionar feedback estará disponível em breve."
+    });
+  };
+
+  const handleAccessPrototype = () => {
+    toast({
+      title: "Em breve!",
+      description: "O acesso ao protótipo estará disponível em breve."
+    });
   };
 
   return (
@@ -65,16 +80,13 @@ const TestMVP = () => {
 
               <section>
                 <h2 className="text-lg font-semibold mb-3">Link para Teste</h2>
-                <Button asChild variant="outline" className="w-full">
-                  <a 
-                    href={mvpDetails.testLink} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center"
-                  >
-                    Acessar Protótipo
-                    <ExternalLink className="w-4 h-4 ml-2" />
-                  </a>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={handleAccessPrototype}
+                >
+                  Acessar Protótipo
+                  <ExternalLink className="w-4 h-4 ml-2" />
                 </Button>
               </section>
             </div>
@@ -83,7 +95,7 @@ const TestMVP = () => {
           <div className="flex justify-center">
             <Button 
               size="lg"
-              onClick={() => navigate(`/mvp/${id}`)}
+              onClick={handleAddFeedback}
               className="gap-2"
             >
               <MessageSquarePlus className="w-5 h-5" />
