@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -48,7 +47,6 @@ const Feed = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
-      {/* Header with Profile and Logout buttons */}
       <div className="fixed top-0 right-0 p-4 z-50 flex gap-2">
         <Button asChild variant="outline" className="bg-white/80 backdrop-blur-sm">
           <Link to="/profile">
@@ -64,7 +62,6 @@ const Feed = () => {
 
       <div className="container px-4 py-8">
         <div className="flex gap-8">
-          {/* Main Feed */}
           <div className="flex-1 space-y-6">
             {mockMVPs.map((mvp) => (
               <Card key={mvp.id} className="p-6 hover:shadow-md transition-shadow">
@@ -72,7 +69,7 @@ const Feed = () => {
                 <p className="text-gray-600 mb-4">{mvp.description}</p>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-500">{mvp.location}</span>
-                  <Button onClick={() => alert('Em breve!')}>
+                  <Button onClick={() => navigate(`/test-mvp/${mvp.id}`)}>
                     Testar MVP
                   </Button>
                 </div>
@@ -80,7 +77,6 @@ const Feed = () => {
             ))}
           </div>
 
-          {/* Sidebar */}
           <div className="w-80 hidden lg:block">
             <div className="bg-white rounded-lg p-6 shadow-sm sticky top-20">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -99,7 +95,6 @@ const Feed = () => {
           </div>
         </div>
 
-        {/* Floating Add Button */}
         <Button asChild size="sm" className="fixed bottom-6 right-6 shadow-lg">
           <Link to="/create-mvp">
             <Plus className="w-4 h-4 mr-2" />

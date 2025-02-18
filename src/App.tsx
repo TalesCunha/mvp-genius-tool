@@ -10,6 +10,7 @@ import Feed from "./pages/Feed";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import MVPDetails from "./pages/MVPDetails";
+import TestMVP from "./pages/TestMVP";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/feed" element={<Feed />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/mvp/:id" element={<MVPDetails />} />
+          <Route path="/test-mvp/:id" element={<TestMVP />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
