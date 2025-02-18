@@ -2,7 +2,11 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import AIFeedback from '@/components/AIFeedback';
 
 const data = [
   { name: 'Jan', rating: 4.2 },
@@ -33,13 +37,26 @@ const comments = [
 ];
 
 const MVPDetails = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
+      <div className="fixed top-0 left-0 p-4 z-50">
+        <Button 
+          variant="outline" 
+          className="bg-white/80 backdrop-blur-sm"
+          onClick={() => navigate('/profile')}
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Voltar
+        </Button>
+      </div>
+
       <div className="container px-4 py-8">
-        <Card className="p-6 mb-8">
-          <h1 className="text-2xl font-bold mb-6">App de Fitness Gamificado</h1>
-          
-          <div className="space-y-6">
+        <div className="space-y-6">
+          <Card className="p-6">
+            <h1 className="text-2xl font-bold mb-6">App de Fitness Gamificado</h1>
+            
             <div>
               <h2 className="text-lg font-semibold mb-4">Avaliações ao Longo do Tempo</h2>
               <div className="h-[300px]">
@@ -60,33 +77,35 @@ const MVPDetails = () => {
                 </ResponsiveContainer>
               </div>
             </div>
+          </Card>
 
-            <div>
-              <h2 className="text-lg font-semibold mb-4">Feedbacks dos Usuários</h2>
-              <div className="space-y-4">
-                {comments.map((comment) => (
-                  <Card key={comment.id} className="p-4">
-                    <div className="flex items-start gap-4">
-                      <Avatar>
-                        <AvatarFallback>{comment.user[0]}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="font-medium">{comment.user}</span>
-                          <span className="text-sm text-gray-500">{comment.date}</span>
-                        </div>
-                        <p className="text-gray-600">{comment.comment}</p>
-                        <div className="mt-2 flex items-center">
-                          <span className="text-sm text-gray-500">Avaliação: {comment.rating}/5</span>
-                        </div>
+          <AIFeedback />
+
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold mb-4">Feedbacks dos Usuários</h2>
+            <div className="space-y-4">
+              {comments.map((comment) => (
+                <Card key={comment.id} className="p-4">
+                  <div className="flex items-start gap-4">
+                    <Avatar>
+                      <AvatarFallback>{comment.user[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-medium">{comment.user}</span>
+                        <span className="text-sm text-gray-500">{comment.date}</span>
+                      </div>
+                      <p className="text-gray-600">{comment.comment}</p>
+                      <div className="mt-2 flex items-center">
+                        <span className="text-sm text-gray-500">Avaliação: {comment.rating}/5</span>
                       </div>
                     </div>
-                  </Card>
-                ))}
-              </div>
+                  </div>
+                </Card>
+              ))}
             </div>
-          </div>
-        </Card>
+          </Card>
+        </div>
       </div>
     </div>
   );
