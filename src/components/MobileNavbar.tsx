@@ -29,13 +29,13 @@ const MobileNavbar = () => {
   if (!isMobile) {
     return (
       <div className="fixed top-0 right-0 p-4 z-50 flex gap-2">
-        <Button asChild variant="outline" className="bg-white/80 backdrop-blur-sm">
+        <Button asChild variant="outline" className="bg-white shadow-sm backdrop-blur-sm">
           <Link to="/user-profile">
             <User className="w-4 h-4 mr-2" />
             Perfil
           </Link>
         </Button>
-        <Button variant="outline" className="bg-white/80 backdrop-blur-sm" onClick={handleLogout}>
+        <Button variant="outline" className="bg-white shadow-sm backdrop-blur-sm" onClick={handleLogout}>
           <LogOut className="w-4 h-4 mr-2" />
           Sair
         </Button>
@@ -47,11 +47,11 @@ const MobileNavbar = () => {
     <div className="fixed top-0 left-0 p-4 z-50">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="icon" className="bg-white/80 backdrop-blur-sm rounded-full">
+          <Button variant="outline" size="icon" className="bg-white shadow-sm backdrop-blur-sm rounded-full">
             <Menu className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-56">
+        <DropdownMenuContent align="start" className="w-56 bg-white shadow-md border border-gray-100">
           <DropdownMenuLabel>Menu</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>

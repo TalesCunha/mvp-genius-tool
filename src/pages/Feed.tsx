@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,9 +5,11 @@ import { TrendingUp, Plus } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import MobileNavbar from '@/components/MobileNavbar';
+import Logo from '@/components/Logo';
 
 const Feed = () => {
   const navigate = useNavigate();
+
   const mockMVPs = [
     {
       id: 1,
@@ -43,7 +44,10 @@ const Feed = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
-      <MobileNavbar />
+      <div className="fixed top-0 left-0 right-0 flex justify-between items-center px-4 py-3 bg-white/80 backdrop-blur-sm z-40 border-b">
+        <Logo size="sm" />
+        <MobileNavbar />
+      </div>
 
       <div className="container px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">

@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
-import { Sparkles, Upload, FileImage } from 'lucide-react';
+import { Sparkles, Upload, FileImage, ArrowLeft } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -85,18 +85,27 @@ const CreateMVP = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="container max-w-3xl px-4">
-        <Card className="p-6">
+        <Button 
+          variant="ghost" 
+          className="mb-4 rounded-full hover:bg-gray-100" 
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          Voltar
+        </Button>
+
+        <Card className="p-6 rounded-2xl shadow-sm">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Publicar Novo MVP</h1>
             
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline">
+                <Button variant="outline" className="rounded-xl">
                   <FileImage className="w-4 h-4 mr-2" />
                   Importar do Figma
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="bg-white">
                 <DialogHeader>
                   <DialogTitle>Importar do Figma</DialogTitle>
                   <DialogDescription>
@@ -108,13 +117,14 @@ const CreateMVP = () => {
                     placeholder="URL do Figma (ex: https://www.figma.com/file/...)" 
                     value={figmaUrl}
                     onChange={(e) => setFigmaUrl(e.target.value)}
+                    className="rounded-xl"
                   />
                   <p className="text-sm text-gray-500">
                     Certifique-se de que o projeto esteja configurado como 'Qualquer pessoa com o link'
                   </p>
                   <Button 
                     onClick={handleImportFromFigma} 
-                    className="w-full"
+                    className="w-full rounded-xl"
                   >
                     <Upload className="w-4 h-4 mr-2" />
                     Importar Imagens
