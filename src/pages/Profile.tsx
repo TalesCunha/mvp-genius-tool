@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Star, ArrowLeft } from 'lucide-react';
+import MobileNavbar from '@/components/MobileNavbar';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const Profile = () => {
       <div className="fixed top-0 left-0 p-4 z-50">
         <Button 
           variant="outline" 
-          className="bg-white/80 backdrop-blur-sm"
+          className="bg-white/80 backdrop-blur-sm rounded-xl"
           onClick={() => navigate('/feed')}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -45,19 +46,16 @@ const Profile = () => {
 
       <div className="container px-4 py-8">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-            <User className="w-8 h-8 text-gray-500" />
-          </div>
           <div>
-            <h1 className="text-2xl font-bold">Meu Perfil</h1>
-            <p className="text-gray-600">2 MVPs publicados</p>
+            <h1 className="text-2xl font-bold">Meus MVPs</h1>
+            <p className="text-gray-600">{userMVPs.length} MVPs publicados</p>
           </div>
         </div>
 
         <div className="grid gap-6">
           {userMVPs.map((mvp) => (
             <Link key={mvp.id} to={`/mvp/${mvp.id}`}>
-              <Card className="p-6 hover:shadow-md transition-all">
+              <Card className="p-6 hover:shadow-md transition-all rounded-xl">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-xl font-semibold mb-2">{mvp.title}</h3>

@@ -31,7 +31,7 @@ const TestMVP = () => {
       <div className="fixed top-0 left-0 p-4 z-50">
         <Button 
           variant="outline" 
-          className="bg-white/80 backdrop-blur-sm"
+          className="bg-white/80 backdrop-blur-sm rounded-xl"
           onClick={() => navigate('/feed')}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -41,7 +41,7 @@ const TestMVP = () => {
 
       <div className="container max-w-4xl px-4 py-8">
         <div className="space-y-6">
-          <Card className="p-6">
+          <Card className="p-6 rounded-xl">
             <h1 className="text-2xl font-bold mb-6">{mvpDetails.title}</h1>
             
             <div className="space-y-8">
@@ -75,7 +75,7 @@ const TestMVP = () => {
                 <h2 className="text-lg font-semibold mb-3">Link para Teste</h2>
                 <Button 
                   variant="outline" 
-                  className="w-full"
+                  className="w-full rounded-xl"
                   onClick={handleAccessPrototype}
                 >
                   Acessar Protótipo
@@ -89,7 +89,13 @@ const TestMVP = () => {
             <Button 
               size="lg"
               asChild
-              className="gap-2"
+              className="gap-2 rounded-xl"
+              onClick={() => {
+                toast({
+                  title: "Em breve!",
+                  description: "Funcionalidade de feedback estará disponível em breve."
+                });
+              }}
             >
               <Link to={`/add-feedback/${id}`}>
                 <MessageSquarePlus className="w-5 h-5" />

@@ -19,6 +19,10 @@ export default {
       },
     },
     extend: {
+      borderRadius: {
+        'xl': '1rem',
+        '2xl': '1.5rem',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

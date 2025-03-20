@@ -9,6 +9,7 @@ import CreateMVP from "./pages/CreateMVP";
 import Feed from "./pages/Feed";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import UserProfile from "./pages/UserProfile";
 import MVPDetails from "./pages/MVPDetails";
 import TestMVP from "./pages/TestMVP";
 import AddFeedback from "./pages/AddFeedback";
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/create-mvp" element={<CreateMVP />} />
           <Route path="/feed" element={<Feed />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/user-profile" element={<UserProfile />} />
           <Route path="/mvp/:id" element={<MVPDetails />} />
           <Route path="/test-mvp/:id" element={<TestMVP />} />
           <Route path="/add-feedback/:id" element={<AddFeedback />} />
