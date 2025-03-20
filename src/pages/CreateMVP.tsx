@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import Logo from '@/components/Logo';
 
 interface AISuggestion {
   features: string[];
@@ -85,14 +86,17 @@ const CreateMVP = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="container max-w-3xl px-4">
-        <Button 
-          variant="ghost" 
-          className="mb-4 rounded-full hover:bg-gray-100" 
-          onClick={() => navigate(-1)}
-        >
-          <ArrowLeft className="w-5 h-5 mr-2" />
-          Voltar
-        </Button>
+        <div className="flex justify-between items-center mb-6">
+          <Logo size="sm" />
+          <Button 
+            variant="ghost" 
+            className="rounded-full hover:bg-gray-100" 
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Voltar
+          </Button>
+        </div>
 
         <Card className="p-6 rounded-2xl shadow-sm">
           <div className="flex justify-between items-center mb-6">
