@@ -3,7 +3,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, MessageSquarePlus, ExternalLink } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 
 const TestMVP = () => {
@@ -17,13 +17,6 @@ const TestMVP = () => {
     limitations: "- Pagamento simulado apenas com cartão de crédito\n- Disponível apenas em inglês no momento\n- Entregas simuladas em Mumbai",
     objectives: "- Validar a usabilidade do processo de pedido\n- Avaliar a clareza das informações dos restaurantes\n- Testar a eficiência do sistema de filtros",
     testLink: "https://exemplo.com/mvp-delivery"
-  };
-
-  const handleAddFeedback = () => {
-    toast({
-      title: "Em breve!",
-      description: "A funcionalidade de adicionar feedback estará disponível em breve."
-    });
   };
 
   const handleAccessPrototype = () => {
@@ -95,11 +88,13 @@ const TestMVP = () => {
           <div className="flex justify-center">
             <Button 
               size="lg"
-              onClick={handleAddFeedback}
+              asChild
               className="gap-2"
             >
-              <MessageSquarePlus className="w-5 h-5" />
-              Adicionar Feedback
+              <Link to={`/add-feedback/${id}`}>
+                <MessageSquarePlus className="w-5 h-5" />
+                Adicionar Feedback
+              </Link>
             </Button>
           </div>
         </div>

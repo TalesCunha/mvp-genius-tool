@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,15 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Upload, FileImage } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface AISuggestion {
   features: string[];
@@ -17,6 +26,8 @@ const CreateMVP = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [figmaUrl, setFigmaUrl] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const mockSuggestions: AISuggestion = {
     features: [
@@ -44,6 +55,24 @@ const CreateMVP = () => {
     });
   };
 
+  const handleImportFromFigma = () => {
+    if (!figmaUrl) {
+      toast({
+        title: "URL necessário",
+        description: "Por favor, insira uma URL do Figma válida",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsDialogOpen(false);
+    
+    toast({
+      title: "Imagens importadas!",
+      description: "As imagens do seu projeto Figma foram importadas com sucesso.",
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
@@ -57,7 +86,43 @@ const CreateMVP = () => {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="container max-w-3xl px-4">
         <Card className="p-6">
-          <h1 className="text-2xl font-bold mb-6">Publicar Novo MVP</h1>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold">Publicar Novo MVP</h1>
+            
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <FileImage className="w-4 h-4 mr-2" />
+                  Importar do Figma
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Importar do Figma</DialogTitle>
+                  <DialogDescription>
+                    Insira a URL do seu projeto Figma para importar as imagens
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <Input 
+                    placeholder="URL do Figma (ex: https://www.figma.com/file/...)" 
+                    value={figmaUrl}
+                    onChange={(e) => setFigmaUrl(e.target.value)}
+                  />
+                  <p className="text-sm text-gray-500">
+                    Certifique-se de que o projeto esteja configurado como 'Qualquer pessoa com o link'
+                  </p>
+                  <Button 
+                    onClick={handleImportFromFigma} 
+                    className="w-full"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Importar Imagens
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
