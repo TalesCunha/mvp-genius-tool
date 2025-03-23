@@ -8,6 +8,8 @@ import Index from "./pages/Index";
 import CreateMVP from "./pages/CreateMVP";
 import Feed from "./pages/Feed";
 import Auth from "./pages/Auth";
+import CreateAccount from "./pages/CreateAccount";
+import UserPreferences from "./pages/UserPreferences";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 import MVPDetails from "./pages/MVPDetails";
@@ -26,6 +28,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/create-account" element={<CreateAccount />} />
+          <Route path="/user-preferences" element={<UserPreferences />} />
           <Route path="/create-mvp" element={<CreateMVP />} />
           <Route path="/feed" element={<Feed />} />
           <Route path="/profile" element={<Profile />} />
