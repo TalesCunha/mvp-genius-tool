@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -13,6 +12,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Logo from '@/components/Logo';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Email inválido' }),
@@ -30,6 +30,7 @@ type FormValues = z.infer<typeof formSchema>;
 const CreateAccount = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { autoConfirmEmail } = useAuth();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -67,6 +68,20 @@ const CreateAccount = () => {
 
       // Store the user data in localStorage so we can access it on the preferences page
       localStorage.setItem('newUserData', JSON.stringify(data));
+      
+      // Try to auto-confirm email to bypass verification
+      await autoConfirmEmail(data.email);
+      
+      // Sign in immediately after registration
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+      
+      if (signInError) {
+        console.log("Sign in after registration failed:", signInError);
+        // Continue to preferences page even if automatic sign-in fails
+      }
       
       toast({
         title: "Conta criada com sucesso!",

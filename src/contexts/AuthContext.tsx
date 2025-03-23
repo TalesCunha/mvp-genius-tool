@@ -3,12 +3,14 @@ import React, { createContext, useState, useEffect, useContext, ReactNode } from
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   signOut: () => Promise<void>;
   isLoading: boolean;
+  autoConfirmEmail: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,8 +44,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await supabase.auth.signOut();
   };
 
+  // Function to auto-confirm email for newly registered users
+  const autoConfirmEmail = async (email: string) => {
+    try {
+      // Get the user
+      const { data: users, error: fetchError } = await supabase.auth.admin.listUsers();
+      
+      if (fetchError) {
+        console.error("Failed to fetch users:", fetchError);
+        return;
+      }
+      
+      const user = users?.users.find(u => u.email === email);
+      
+      if (!user) {
+        console.error("User not found with email:", email);
+        return;
+      }
+      
+      // Try to confirm their email
+      await supabase.auth.admin.updateUserById(
+        user.id,
+        { email_confirm: true }
+      );
+      
+      toast({
+        title: "Email confirmado!",
+        description: "Você pode entrar normalmente agora.",
+      });
+    } catch (error) {
+      console.error("Error confirming email:", error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, signOut, isLoading }}>
+    <AuthContext.Provider value={{ user, session, signOut, isLoading, autoConfirmEmail }}>
       {children}
     </AuthContext.Provider>
   );

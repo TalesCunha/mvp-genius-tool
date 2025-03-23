@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { toast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import Logo from '@/components/Logo';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -15,6 +15,7 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const { autoConfirmEmail } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +29,34 @@ const Auth = () => {
       });
 
       if (error) {
+        if (error.message.includes('Email not confirmed')) {
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email,
+            password,
+          });
+          
+          if (signUpError) {
+            throw signUpError;
+          }
+          
+          const { data: secondSignInData, error: secondSignInError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+          
+          if (secondSignInError) {
+            await autoConfirmEmail(email);
+            throw new Error("Tentando confirmar seu email automaticamente. Por favor, tente fazer login novamente em alguns segundos.");
+          }
+          
+          toast({
+            title: "Sucesso!",
+            description: "Login realizado com sucesso.",
+          });
+          navigate('/feed');
+          return;
+        }
+        
         throw error;
       }
 
