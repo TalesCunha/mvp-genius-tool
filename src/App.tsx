@@ -16,30 +16,53 @@ import MVPDetails from "./pages/MVPDetails";
 import TestMVP from "./pages/TestMVP";
 import AddFeedback from "./pages/AddFeedback";
 import NotFound from "./pages/NotFound";
+import { AuthProvider, RequireAuth } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/create-account" element={<CreateAccount />} />
-          <Route path="/user-preferences" element={<UserPreferences />} />
-          <Route path="/create-mvp" element={<CreateMVP />} />
-          <Route path="/feed" element={<Feed />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/user-profile" element={<UserProfile />} />
-          <Route path="/mvp/:id" element={<MVPDetails />} />
-          <Route path="/test-mvp/:id" element={<TestMVP />} />
-          <Route path="/add-feedback/:id" element={<AddFeedback />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/create-account" element={<CreateAccount />} />
+            <Route path="/user-preferences" element={<UserPreferences />} />
+            <Route path="/feed" element={
+              <RequireAuth>
+                <Feed />
+              </RequireAuth>
+            } />
+            <Route path="/create-mvp" element={
+              <RequireAuth>
+                <CreateMVP />
+              </RequireAuth>
+            } />
+            <Route path="/profile" element={
+              <RequireAuth>
+                <Profile />
+              </RequireAuth>
+            } />
+            <Route path="/user-profile" element={
+              <RequireAuth>
+                <UserProfile />
+              </RequireAuth>
+            } />
+            <Route path="/mvp/:id" element={<MVPDetails />} />
+            <Route path="/test-mvp/:id" element={<TestMVP />} />
+            <Route path="/add-feedback/:id" element={
+              <RequireAuth>
+                <AddFeedback />
+              </RequireAuth>
+            } />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

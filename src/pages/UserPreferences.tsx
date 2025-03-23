@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import Logo from '@/components/Logo';
+import { supabase } from '@/integrations/supabase/client';
 
 const userTypes = [
   {
@@ -40,6 +41,22 @@ const UserPreferences = () => {
   const navigate = useNavigate();
   const [userType, setUserType] = useState<string | null>(null);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    // Check if user is authenticated
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        navigate('/auth');
+        return;
+      }
+      setUser(data.session.user);
+    };
+    
+    checkUser();
+  }, [navigate]);
 
   const handleInterestChange = (id: string) => {
     setSelectedInterests(prev => 
@@ -49,7 +66,7 @@ const UserPreferences = () => {
     );
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!userType) {
       toast({
         title: "Selecione um tipo de usuário",
@@ -59,31 +76,55 @@ const UserPreferences = () => {
       return;
     }
 
-    // Get user data from localStorage
-    const userData = JSON.parse(localStorage.getItem('newUserData') || '{}');
-    
-    // Combine with preferences
-    const completeUserData = {
-      ...userData,
-      userType,
-      interests: selectedInterests,
-    };
+    if (!user) {
+      toast({
+        title: "Usuário não autenticado",
+        description: "Por favor, faça login novamente",
+        variant: "destructive",
+      });
+      navigate('/auth');
+      return;
+    }
 
-    console.log("Complete user data:", completeUserData);
+    setIsLoading(true);
     
-    // In a real app, you would send this to your backend
-    // But for now we'll just simulate success and redirect
-    
-    toast({
-      title: "Preferências salvas!",
-      description: "Sua conta foi configurada com sucesso.",
-    });
-    
-    // Clear temporary storage
-    localStorage.removeItem('newUserData');
-    
-    // Navigate to feed
-    navigate('/feed');
+    try {
+      // Get user data from localStorage
+      const userData = JSON.parse(localStorage.getItem('newUserData') || '{}');
+      
+      // Create or update profile in Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          full_name: `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
+          username: userData.email?.split('@')[0] || `user_${Math.random().toString(36).substring(2, 9)}`,
+          location: userData.country || null,
+        });
+
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Preferências salvas!",
+        description: "Sua conta foi configurada com sucesso.",
+      });
+      
+      // Clear temporary storage
+      localStorage.removeItem('newUserData');
+      
+      // Navigate to feed
+      navigate('/feed');
+    } catch (error: any) {
+      toast({
+        title: "Erro ao salvar preferências",
+        description: error.message || "Ocorreu um erro ao salvar suas preferências.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -135,8 +176,12 @@ const UserPreferences = () => {
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleSubmit} className="w-full rounded-xl">
-            Concluir Cadastro
+          <Button 
+            onClick={handleSubmit} 
+            className="w-full rounded-xl"
+            disabled={isLoading}
+          >
+            {isLoading ? "Salvando..." : "Concluir Cadastro"}
           </Button>
         </CardFooter>
       </Card>

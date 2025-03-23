@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Logo from '@/components/Logo';
+import { supabase } from '@/integrations/supabase/client';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Email inválido' }),
@@ -28,6 +29,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 const CreateAccount = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -41,15 +43,46 @@ const CreateAccount = () => {
     },
   });
 
-  const onSubmit = (data: FormValues) => {
-    console.log("Form data:", data);
-    toast({
-      title: "Conta criada com sucesso!",
-      description: "Vamos configurar suas preferências.",
-    });
-    // Store the user data in localStorage so we can access it on the preferences page
-    localStorage.setItem('newUserData', JSON.stringify(data));
-    navigate('/user-preferences');
+  const onSubmit = async (data: FormValues) => {
+    setIsLoading(true);
+    
+    try {
+      // Register the user with Supabase
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            age: parseInt(data.age),
+            country: data.country,
+          }
+        }
+      });
+
+      if (authError) {
+        throw authError;
+      }
+
+      // Store the user data in localStorage so we can access it on the preferences page
+      localStorage.setItem('newUserData', JSON.stringify(data));
+      
+      toast({
+        title: "Conta criada com sucesso!",
+        description: "Vamos configurar suas preferências.",
+      });
+      
+      navigate('/user-preferences');
+    } catch (error: any) {
+      toast({
+        title: "Erro ao criar conta",
+        description: error.message || "Ocorreu um erro ao criar sua conta.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -165,8 +198,9 @@ const CreateAccount = () => {
               <Button 
                 type="submit" 
                 className="w-full rounded-xl"
+                disabled={isLoading}
               >
-                Criar Conta
+                {isLoading ? 'Criando...' : 'Criar Conta'}
               </Button>
             </form>
           </Form>

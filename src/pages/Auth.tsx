@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,17 +7,45 @@ import { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription }
 import { toast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import Logo from '@/components/Logo';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Sucesso!",
-      description: "Login realizado com sucesso.",
-    });
-    navigate('/feed');
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Sucesso!",
+        description: "Login realizado com sucesso.",
+      });
+      navigate('/feed');
+    } catch (err: any) {
+      setError(err.message || 'Erro ao fazer login');
+      toast({
+        title: "Erro",
+        description: err.message || 'Erro ao fazer login',
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -34,13 +62,20 @@ const Auth = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                defaultValue="usuario@exemplo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="rounded-xl"
+                required
               />
             </div>
             <div className="space-y-2">
@@ -48,12 +83,14 @@ const Auth = () => {
               <Input
                 id="password"
                 type="password"
-                defaultValue="senha123"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="rounded-xl"
+                required
               />
             </div>
-            <Button type="submit" className="w-full rounded-xl">
-              Entrar
+            <Button type="submit" className="w-full rounded-xl" disabled={isLoading}>
+              {isLoading ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
         </CardContent>
