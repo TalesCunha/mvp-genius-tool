@@ -13,28 +13,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useAuth } from '@/contexts/AuthContext';
 
 const MobileNavbar = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { signOut } = useAuth();
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      toast({
-        title: "Logout realizado",
-        description: "Você foi desconectado com sucesso"
-      });
-      navigate('/');
-    } catch (error) {
-      toast({
-        title: "Erro ao fazer logout",
-        description: "Ocorreu um erro ao tentar desconectar",
-        variant: "destructive"
-      });
-    }
+  const handleLogout = () => {
+    toast({
+      title: "Logout realizado",
+      description: "Você foi desconectado com sucesso"
+    });
+    navigate('/');
   };
 
   if (!isMobile) {

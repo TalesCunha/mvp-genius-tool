@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,8 +12,6 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Logo from '@/components/Logo';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Email inválido' }),
@@ -30,8 +28,6 @@ type FormValues = z.infer<typeof formSchema>;
 
 const CreateAccount = () => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const { autoConfirmEmail } = useAuth();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -45,90 +41,15 @@ const CreateAccount = () => {
     },
   });
 
-  const onSubmit = async (data: FormValues) => {
-    setIsLoading(true);
-    
-    try {
-      // Check if email exists first
-      const { data: existingUser, error: checkError } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: 'dummy_check_only', // This will fail if user doesn't exist, or password is wrong
-      });
-      
-      if (!checkError) {
-        // User exists and credentials are valid (very unlikely with dummy password)
-        toast({
-          title: "Email já cadastrado",
-          description: "Este email já está sendo usado. Por favor, faça login ou use outro email.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      } else if (!checkError.message.includes('Invalid login credentials')) {
-        // There was a different error
-        throw checkError;
-      }
-      
-      // At this point, either user doesn't exist or password is wrong
-      // Let's check specifically for "User not found"
-      const { data: signUpCheck, error: signUpCheckError } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            first_name: data.firstName,
-            last_name: data.lastName,
-            age: parseInt(data.age),
-            country: data.country,
-          }
-        }
-      });
-      
-      if (signUpCheckError) {
-        if (signUpCheckError.message.includes('already registered')) {
-          toast({
-            title: "Email já cadastrado",
-            description: "Este email já está sendo usado. Por favor, faça login ou use outro email.",
-            variant: "destructive",
-          });
-          setIsLoading(false);
-          return;
-        }
-        throw signUpCheckError;
-      }
-
-      // Store the user data in localStorage so we can access it on the preferences page
-      localStorage.setItem('newUserData', JSON.stringify(data));
-      
-      // Try to auto-confirm email to bypass verification
-      await autoConfirmEmail(data.email);
-      
-      // Sign in immediately after registration
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
-      
-      if (signInError) {
-        console.log("Sign in after registration failed:", signInError);
-        // Continue to preferences page even if automatic sign-in fails
-      }
-      
-      toast({
-        title: "Conta criada com sucesso!",
-        description: "Vamos configurar suas preferências.",
-      });
-      
-      navigate('/user-preferences');
-    } catch (error: any) {
-      toast({
-        title: "Erro ao criar conta",
-        description: error.message || "Ocorreu um erro ao criar sua conta.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const onSubmit = (data: FormValues) => {
+    console.log("Form data:", data);
+    toast({
+      title: "Conta criada com sucesso!",
+      description: "Vamos configurar suas preferências.",
+    });
+    // Store the user data in localStorage so we can access it on the preferences page
+    localStorage.setItem('newUserData', JSON.stringify(data));
+    navigate('/user-preferences');
   };
 
   return (
@@ -244,9 +165,8 @@ const CreateAccount = () => {
               <Button 
                 type="submit" 
                 className="w-full rounded-xl"
-                disabled={isLoading}
               >
-                {isLoading ? 'Criando...' : 'Criar Conta'}
+                Criar Conta
               </Button>
             </form>
           </Form>
