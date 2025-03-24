@@ -1,23 +1,36 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription } from '@/components/ui/card';
-import { toast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import Logo from '@/components/Logo';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Auth = () => {
   const navigate = useNavigate();
+  const { signIn, user } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    // Redirect if user is already logged in
+    if (user) {
+      navigate('/feed');
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Sucesso!",
-      description: "Login realizado com sucesso.",
-    });
-    navigate('/feed');
+    setIsLoading(true);
+    
+    try {
+      await signIn(email, password);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -39,8 +52,10 @@ const Auth = () => {
               <Input
                 id="email"
                 type="email"
-                defaultValue="usuario@exemplo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="rounded-xl"
+                required
               />
             </div>
             <div className="space-y-2">
@@ -48,12 +63,18 @@ const Auth = () => {
               <Input
                 id="password"
                 type="password"
-                defaultValue="senha123"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="rounded-xl"
+                required
               />
             </div>
-            <Button type="submit" className="w-full rounded-xl">
-              Entrar
+            <Button 
+              type="submit" 
+              className="w-full rounded-xl" 
+              disabled={isLoading}
+            >
+              {isLoading ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
         </CardContent>

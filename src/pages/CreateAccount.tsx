@@ -1,17 +1,17 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Logo from '@/components/Logo';
+import { useAuth } from '@/contexts/AuthContext';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Email inválido' }),
@@ -28,6 +28,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 const CreateAccount = () => {
   const navigate = useNavigate();
+  const { signUp, user } = useAuth();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -41,15 +42,22 @@ const CreateAccount = () => {
     },
   });
 
-  const onSubmit = (data: FormValues) => {
-    console.log("Form data:", data);
-    toast({
-      title: "Conta criada com sucesso!",
-      description: "Vamos configurar suas preferências.",
-    });
-    // Store the user data in localStorage so we can access it on the preferences page
-    localStorage.setItem('newUserData', JSON.stringify(data));
-    navigate('/user-preferences');
+  useEffect(() => {
+    // Redirect if user is already logged in
+    if (user) {
+      navigate('/feed');
+    }
+  }, [user, navigate]);
+
+  const onSubmit = async (data: FormValues) => {
+    const userData = {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      age: data.age,
+      country: data.country,
+    };
+
+    await signUp(data.email, data.password, userData);
   };
 
   return (
@@ -165,8 +173,9 @@ const CreateAccount = () => {
               <Button 
                 type="submit" 
                 className="w-full rounded-xl"
+                disabled={form.formState.isSubmitting}
               >
-                Criar Conta
+                {form.formState.isSubmitting ? 'Criando...' : 'Criar Conta'}
               </Button>
             </form>
           </Form>

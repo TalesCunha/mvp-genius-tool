@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import Logo from '@/components/Logo';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const userTypes = [
   {
@@ -38,8 +40,16 @@ const interests = [
 
 const UserPreferences = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [userType, setUserType] = useState<string | null>(null);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    // Get user data from localStorage if available
+    const userData = JSON.parse(localStorage.getItem('newUserData') || '{}');
+    console.log("User data from localStorage:", userData);
+  }, []);
 
   const handleInterestChange = (id: string) => {
     setSelectedInterests(prev => 
@@ -49,7 +59,7 @@ const UserPreferences = () => {
     );
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!userType) {
       toast({
         title: "Selecione um tipo de usuário",
@@ -59,31 +69,48 @@ const UserPreferences = () => {
       return;
     }
 
-    // Get user data from localStorage
-    const userData = JSON.parse(localStorage.getItem('newUserData') || '{}');
-    
-    // Combine with preferences
-    const completeUserData = {
-      ...userData,
-      userType,
-      interests: selectedInterests,
-    };
+    if (!user) {
+      toast({
+        title: "Erro",
+        description: "Você precisa estar logado para completar o cadastro",
+        variant: "destructive",
+      });
+      navigate('/auth');
+      return;
+    }
 
-    console.log("Complete user data:", completeUserData);
-    
-    // In a real app, you would send this to your backend
-    // But for now we'll just simulate success and redirect
-    
-    toast({
-      title: "Preferências salvas!",
-      description: "Sua conta foi configurada com sucesso.",
-    });
-    
-    // Clear temporary storage
-    localStorage.removeItem('newUserData');
-    
-    // Navigate to feed
-    navigate('/feed');
+    setIsSubmitting(true);
+
+    try {
+      // Update user metadata
+      const { error } = await supabase.auth.updateUser({
+        data: {
+          userType,
+          interests: selectedInterests,
+        }
+      });
+
+      if (error) throw error;
+      
+      toast({
+        title: "Preferências salvas!",
+        description: "Sua conta foi configurada com sucesso.",
+      });
+      
+      // Clear temporary storage
+      localStorage.removeItem('newUserData');
+      
+      // Navigate to feed
+      navigate('/feed');
+    } catch (error: any) {
+      toast({
+        title: "Erro ao salvar preferências",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -135,8 +162,12 @@ const UserPreferences = () => {
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleSubmit} className="w-full rounded-xl">
-            Concluir Cadastro
+          <Button 
+            onClick={handleSubmit} 
+            className="w-full rounded-xl"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Salvando...' : 'Concluir Cadastro'}
           </Button>
         </CardFooter>
       </Card>

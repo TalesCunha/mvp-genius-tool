@@ -13,17 +13,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAuth } from '@/contexts/AuthContext';
 
 const MobileNavbar = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { signOut } = useAuth();
 
-  const handleLogout = () => {
-    toast({
-      title: "Logout realizado",
-      description: "Você foi desconectado com sucesso"
-    });
-    navigate('/');
+  const handleLogout = async () => {
+    await signOut();
   };
 
   if (!isMobile) {
@@ -39,6 +37,12 @@ const MobileNavbar = () => {
           <Link to="/user-profile">
             <User className="w-4 h-4 mr-2" />
             Perfil
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="bg-white shadow-sm backdrop-blur-sm">
+          <Link to="/profile">
+            <Settings className="w-4 h-4 mr-2" />
+            Meus MVPs
           </Link>
         </Button>
         <Button variant="outline" className="bg-white shadow-sm backdrop-blur-sm" onClick={handleLogout}>
