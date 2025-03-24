@@ -9,6 +9,7 @@ import FigmaImportDialog from '@/components/mvp/FigmaImportDialog';
 import AISuggestions from '@/components/mvp/AISuggestions';
 import MVPLinkInput from '@/components/mvp/MVPLinkInput';
 import MVPFormSection from '@/components/mvp/MVPFormSection';
+import ImageUploader from '@/components/mvp/ImageUploader';
 
 const CreateMVP = () => {
   const navigate = useNavigate();
@@ -16,6 +17,8 @@ const CreateMVP = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [mvpUrl, setMvpUrl] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +27,20 @@ const CreateMVP = () => {
       description: "MVP publicado com sucesso.",
     });
     navigate('/feed');
+  };
+
+  const handleImageUpload = (file: File, preview: string) => {
+    setImageFile(file);
+    setImagePreview(preview);
+    toast({
+      title: "Imagem carregada",
+      description: "A imagem foi carregada com sucesso.",
+    });
+  };
+
+  const handleImageClear = () => {
+    setImageFile(null);
+    setImagePreview(null);
   };
 
   const formSections = [
@@ -100,6 +117,12 @@ const CreateMVP = () => {
               <MVPFormSection 
                 title={formSections[0].title} 
                 fields={formSections[0].fields} 
+              />
+              
+              <ImageUploader
+                onImageUpload={handleImageUpload}
+                imageSrc={imagePreview}
+                onImageClear={handleImageClear}
               />
               
               <MVPLinkInput mvpUrl={mvpUrl} setMvpUrl={setMvpUrl} />
