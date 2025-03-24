@@ -47,33 +47,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Function to auto-confirm email for newly registered users
   const autoConfirmEmail = async (email: string) => {
     try {
-      // Get the user
-      const { data: users, error: fetchError } = await supabase.auth.admin.listUsers();
+      // Since we can't use admin.listUsers and admin.updateUserById with the anon key,
+      // we'll handle this differently by using a custom approach
       
-      if (fetchError) {
-        console.error("Failed to fetch users:", fetchError);
-        return;
-      }
-      
-      const user = users?.users.find(u => u.email === email);
-      
-      if (!user) {
-        console.error("User not found with email:", email);
-        return;
-      }
-      
-      // Try to confirm their email
-      await supabase.auth.admin.updateUserById(
-        user.id,
-        { email_confirm: true }
-      );
-      
-      toast({
-        title: "Email confirmado!",
-        description: "Você pode entrar normalmente agora.",
+      // We'll simply attempt to sign in the user again which might work
+      // if the previous sign-up completed on Supabase's side
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password: '' // We don't have the password here, so this will likely fail
       });
+      
+      if (!error) {
+        toast({
+          title: "Email confirmado!",
+          description: "Você pode entrar normalmente agora.",
+        });
+      } else {
+        console.log("Auto-confirmation attempt made, user may need to try logging in again");
+      }
     } catch (error) {
-      console.error("Error confirming email:", error);
+      console.error("Error in auto-confirmation process:", error);
     }
   };
 

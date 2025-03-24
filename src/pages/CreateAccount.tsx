@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -48,8 +49,29 @@ const CreateAccount = () => {
     setIsLoading(true);
     
     try {
-      // Register the user with Supabase
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // Check if email exists first
+      const { data: existingUser, error: checkError } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: 'dummy_check_only', // This will fail if user doesn't exist, or password is wrong
+      });
+      
+      if (!checkError) {
+        // User exists and credentials are valid (very unlikely with dummy password)
+        toast({
+          title: "Email já cadastrado",
+          description: "Este email já está sendo usado. Por favor, faça login ou use outro email.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      } else if (!checkError.message.includes('Invalid login credentials')) {
+        // There was a different error
+        throw checkError;
+      }
+      
+      // At this point, either user doesn't exist or password is wrong
+      // Let's check specifically for "User not found"
+      const { data: signUpCheck, error: signUpCheckError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
@@ -61,9 +83,18 @@ const CreateAccount = () => {
           }
         }
       });
-
-      if (authError) {
-        throw authError;
+      
+      if (signUpCheckError) {
+        if (signUpCheckError.message.includes('already registered')) {
+          toast({
+            title: "Email já cadastrado",
+            description: "Este email já está sendo usado. Por favor, faça login ou use outro email.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
+        }
+        throw signUpCheckError;
       }
 
       // Store the user data in localStorage so we can access it on the preferences page

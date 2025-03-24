@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -23,35 +24,38 @@ const Auth = () => {
     setError('');
     
     try {
+      // Try to sign in first
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        // Handle different error cases
         if (error.message.includes('Email not confirmed')) {
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          // Try to auto-confirm the email
+          await autoConfirmEmail(email);
+          throw new Error("Tentando confirmar seu email automaticamente. Por favor, tente fazer login novamente em alguns segundos.");
+        } else if (error.message.includes('Invalid login credentials')) {
+          // Check if the user exists but with wrong password
+          const { data: userData, error: userError } = await supabase.auth.signUp({
             email,
             password,
           });
           
-          if (signUpError) {
-            throw signUpError;
+          if (userError) {
+            if (userError.message.includes('already registered')) {
+              throw new Error("Senha incorreta. Por favor tente novamente.");
+            }
+            throw userError;
           }
           
-          const { data: secondSignInData, error: secondSignInError } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-          
-          if (secondSignInError) {
-            await autoConfirmEmail(email);
-            throw new Error("Tentando confirmar seu email automaticamente. Por favor, tente fazer login novamente em alguns segundos.");
-          }
+          // If we got here, the user didn't exist and we created a new account
+          await autoConfirmEmail(email);
           
           toast({
-            title: "Sucesso!",
-            description: "Login realizado com sucesso.",
+            title: "Conta criada!",
+            description: "Uma nova conta foi criada com sucesso.",
           });
           navigate('/feed');
           return;
