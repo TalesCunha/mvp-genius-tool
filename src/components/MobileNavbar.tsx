@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, User, LogOut, Settings } from 'lucide-react';
+import { Menu, User, LogOut, Settings, HelpCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import {
   DropdownMenu,
@@ -29,6 +29,12 @@ const MobileNavbar = () => {
   if (!isMobile) {
     return (
       <div className="fixed top-0 right-0 p-4 z-50 flex gap-2">
+        <Button asChild variant="outline" className="bg-white shadow-sm backdrop-blur-sm">
+          <Link to="/qanda">
+            <HelpCircle className="w-4 h-4 mr-2" />
+            Q&A
+          </Link>
+        </Button>
         <Button asChild variant="outline" className="bg-white shadow-sm backdrop-blur-sm">
           <Link to="/user-profile">
             <User className="w-4 h-4 mr-2" />
@@ -64,6 +70,12 @@ const MobileNavbar = () => {
             <Link to="/profile" className="flex items-center w-full cursor-pointer">
               <Settings className="mr-2 h-4 w-4" />
               <span>Meus MVPs</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/qanda" className="flex items-center w-full cursor-pointer">
+              <HelpCircle className="mr-2 h-4 w-4" />
+              <span>Perguntas e Respostas</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />

@@ -15,6 +15,7 @@ import UserProfile from "./pages/UserProfile";
 import MVPDetails from "./pages/MVPDetails";
 import TestMVP from "./pages/TestMVP";
 import AddFeedback from "./pages/AddFeedback";
+import QandA from "./pages/QandA";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/mvp/:id" element={<MVPDetails />} />
           <Route path="/test-mvp/:id" element={<TestMVP />} />
           <Route path="/add-feedback/:id" element={<AddFeedback />} />
+          <Route path="/qanda" element={<QandA />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

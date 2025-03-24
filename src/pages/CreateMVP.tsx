@@ -9,6 +9,7 @@ import FigmaImportDialog from '@/components/mvp/FigmaImportDialog';
 import AISuggestions from '@/components/mvp/AISuggestions';
 import MVPLinkInput from '@/components/mvp/MVPLinkInput';
 import MVPFormSection from '@/components/mvp/MVPFormSection';
+import ImageUploader from '@/components/mvp/ImageUploader';
 
 const CreateMVP = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const CreateMVP = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [mvpUrl, setMvpUrl] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,10 +91,6 @@ const CreateMVP = () => {
         <Card className="p-6 rounded-2xl shadow-sm">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Publicar Novo MVP</h1>
-            <FigmaImportDialog 
-              isOpen={isDialogOpen} 
-              onOpenChange={setIsDialogOpen} 
-            />
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -103,6 +101,18 @@ const CreateMVP = () => {
               />
               
               <MVPLinkInput mvpUrl={mvpUrl} setMvpUrl={setMvpUrl} />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Imagens do MVP</h3>
+                <ImageUploader onImageChange={setUploadedImage} />
+                
+                <div className="flex justify-end mt-2">
+                  <FigmaImportDialog 
+                    isOpen={isDialogOpen} 
+                    onOpenChange={setIsDialogOpen} 
+                  />
+                </div>
+              </div>
               
               <AISuggestions 
                 showSuggestions={showSuggestions}
