@@ -9,6 +9,86 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      mvp_validations: {
+        Row: {
+          created_at: string
+          feedback: string | null
+          id: string
+          mvp_id: string
+          rating: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          mvp_id: string
+          rating?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          mvp_id?: string
+          rating?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mvp_validations_mvp_id_fkey"
+            columns: ["mvp_id"]
+            isOneToOne: false
+            referencedRelation: "mvps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mvps: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          instructions: string | null
+          limitations: string | null
+          location: string | null
+          mvp_url: string | null
+          test_objectives: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          instructions?: string | null
+          limitations?: string | null
+          location?: string | null
+          mvp_url?: string | null
+          test_objectives?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          instructions?: string | null
+          limitations?: string | null
+          location?: string | null
+          mvp_url?: string | null
+          test_objectives?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
