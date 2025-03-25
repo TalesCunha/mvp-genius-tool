@@ -3,11 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Star, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
+import { User, Star, ArrowLeft, Loader2, AlertCircle, Eye, Users, Calendar } from 'lucide-react';
 import MobileNavbar from '@/components/MobileNavbar';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
 interface MVPMetrics {
   views: number;
@@ -19,6 +20,7 @@ interface UserMVP {
   id: string;
   title: string;
   description: string;
+  created_at: string;
   metrics: MVPMetrics;
 }
 
@@ -38,50 +40,37 @@ const Profile = () => {
       try {
         setLoading(true);
         
-        // Fetch all MVPs created by the user
+        // Fetch all MVPs created by the user with their validations
         const { data: mvpsData, error: mvpsError } = await supabase
           .from('mvps')
-          .select('*')
+          .select('*, mvp_validations(*)')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
         
         if (mvpsError) throw mvpsError;
         
-        // Fetch all validations for the user's MVPs
-        const mvpIds = mvpsData.map(mvp => mvp.id);
-        
-        let validationsData: any[] = [];
-        if (mvpIds.length > 0) {
-          const { data, error: validationsError } = await supabase
-            .from('mvp_validations')
-            .select('*')
-            .in('mvp_id', mvpIds);
-          
-          if (validationsError) throw validationsError;
-          validationsData = data || [];
-        }
-        
         // Process the data to create UserMVP objects with metrics
-        const processedMVPs = mvpsData.map(mvp => {
-          // Filter validations for this specific MVP
-          const mvpValidations = validationsData.filter(v => v.mvp_id === mvp.id);
+        const processedMVPs = mvpsData?.map(mvp => {
+          const validations = mvp.mvp_validations || [];
+          const testers = validations.length;
           
-          // Calculate metrics
-          const testers = mvpValidations.length;
-          const totalRating = mvpValidations.reduce((sum, v) => sum + (v.rating || 0), 0);
-          const avgRating = testers > 0 ? totalRating / testers : 0;
+          // Calculate average rating
+          const totalRating = validations.reduce((sum: number, val: any) => 
+            sum + (val.rating || 0), 0);
+          const avgRating = testers > 0 ? (totalRating / testers) : 0;
           
           return {
             id: mvp.id,
             title: mvp.title,
             description: mvp.description,
+            created_at: mvp.created_at,
             metrics: {
               views: Math.floor(Math.random() * 100) + testers * 2, // Simulate views (random + based on testers)
               testers: testers,
               rating: avgRating,
             }
           };
-        });
+        }) || [];
         
         setUserMVPs(processedMVPs);
       } catch (error) {
@@ -121,11 +110,17 @@ const Profile = () => {
       </div>
 
       <div className="container px-4 py-8">
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold">Meus MVPs</h1>
-            <p className="text-gray-600">{userMVPs.length} MVPs publicados</p>
+            <p className="text-gray-600">{userMVPs.length} {userMVPs.length === 1 ? 'MVP publicado' : 'MVPs publicados'}</p>
           </div>
+          <Button 
+            onClick={() => navigate('/create-mvp')}
+            className="rounded-xl"
+          >
+            Criar novo MVP
+          </Button>
         </div>
 
         <div className="grid gap-6">
@@ -143,24 +138,51 @@ const Profile = () => {
             </div>
           ) : (
             userMVPs.map((mvp) => (
-              <Link key={mvp.id} to={`/mvp/${mvp.id}`}>
-                <Card className="p-6 hover:shadow-md transition-all rounded-xl">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-semibold mb-2">{mvp.title}</h3>
-                      <p className="text-gray-600">{mvp.description}</p>
+              <Card key={mvp.id} className="p-6 hover:shadow-md transition-all rounded-xl">
+                <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold mb-2">{mvp.title}</h3>
+                    <p className="text-gray-600 mb-3">{mvp.description}</p>
+                    <div className="flex items-center text-sm text-gray-500">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      <span>Criado em {format(new Date(mvp.created_at), 'dd/MM/yyyy')}</span>
                     </div>
-                    <div className="flex items-center gap-1">
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <div className="flex items-center gap-1 mb-2">
                       <Star className={`w-5 h-5 ${mvp.metrics.rating > 0 ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
                       <span className="font-medium">{mvp.metrics.rating > 0 ? mvp.metrics.rating.toFixed(1) : '-'}</span>
                     </div>
+                    <div className="flex gap-4 text-sm">
+                      <div className="flex items-center gap-1">
+                        <Eye className="w-4 h-4 text-gray-400" />
+                        <span>{mvp.metrics.views}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Users className="w-4 h-4 text-gray-400" />
+                        <span>{mvp.metrics.testers}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex gap-6 text-sm text-gray-500">
-                    <span>{mvp.metrics.views} visualizações</span>
-                    <span>{mvp.metrics.testers} testadores</span>
-                  </div>
-                </Card>
-              </Link>
+                </div>
+                <div className="flex justify-between mt-6">
+                  <Button 
+                    variant="outline"
+                    asChild
+                  >
+                    <Link to={`/test-mvp/${mvp.id}`}>
+                      Visualizar teste
+                    </Link>
+                  </Button>
+                  <Button 
+                    asChild
+                  >
+                    <Link to={`/mvp/${mvp.id}`}>
+                      Ver detalhes
+                    </Link>
+                  </Button>
+                </div>
+              </Card>
             ))
           )}
         </div>
