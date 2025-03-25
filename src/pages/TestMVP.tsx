@@ -1,30 +1,98 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MessageSquarePlus, ExternalLink } from 'lucide-react';
+import { ArrowLeft, MessageSquarePlus, ExternalLink, Loader2 } from 'lucide-react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+
+interface MVPData {
+  id: string;
+  title: string;
+  description: string;
+  context?: string;
+  instructions: string | null;
+  limitations: string | null;
+  test_objectives: string | null;
+  mvp_url: string | null;
+}
 
 const TestMVP = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [mvpDetails, setMvpDetails] = useState<MVPData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const mvpDetails = {
-    title: "App de Delivery na Índia",
-    context: "Este MVP é uma solução de delivery focada no mercado indiano, especialmente para restaurantes veganos.",
-    instructions: "1. Acesse o protótipo através do link\n2. Tente realizar um pedido completo\n3. Explore as opções de filtro por tipo de culinária\n4. Teste o sistema de avaliação de restaurantes",
-    limitations: "- Pagamento simulado apenas com cartão de crédito\n- Disponível apenas em inglês no momento\n- Entregas simuladas em Mumbai",
-    objectives: "- Validar a usabilidade do processo de pedido\n- Avaliar a clareza das informações dos restaurantes\n- Testar a eficiência do sistema de filtros",
-    testLink: "https://exemplo.com/mvp-delivery"
-  };
+  useEffect(() => {
+    const fetchMVPData = async () => {
+      if (!id) {
+        toast({
+          title: "Erro",
+          description: "ID do MVP não encontrado",
+          variant: "destructive"
+        });
+        navigate('/feed');
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('mvps')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (error) {
+          throw error;
+        }
+
+        if (data) {
+          setMvpDetails(data);
+        } else {
+          toast({
+            title: "Erro",
+            description: "MVP não encontrado",
+            variant: "destructive"
+          });
+          navigate('/feed');
+        }
+      } catch (error) {
+        console.error('Error fetching MVP data:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível carregar os dados do MVP",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMVPData();
+  }, [id, navigate]);
 
   const handleAccessPrototype = () => {
-    toast({
-      title: "Em breve!",
-      description: "O acesso ao protótipo estará disponível em breve."
-    });
+    if (mvpDetails?.mvp_url) {
+      window.open(mvpDetails.mvp_url, '_blank');
+    } else {
+      toast({
+        title: "Link indisponível",
+        description: "Este MVP não possui um link para teste."
+      });
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p>Carregando dados do MVP...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
@@ -39,72 +107,76 @@ const TestMVP = () => {
         </Button>
       </div>
 
-      <div className="container max-w-4xl px-4 py-8">
-        <div className="space-y-6">
-          <Card className="p-6 rounded-xl">
-            <h1 className="text-2xl font-bold mb-6">{mvpDetails.title}</h1>
-            
-            <div className="space-y-8">
-              <section>
-                <h2 className="text-lg font-semibold mb-3">Contexto</h2>
-                <p className="text-gray-600">{mvpDetails.context}</p>
-              </section>
+      {mvpDetails && (
+        <div className="container max-w-4xl px-4 py-8">
+          <div className="space-y-6">
+            <Card className="p-6 rounded-xl">
+              <h1 className="text-2xl font-bold mb-6">{mvpDetails.title}</h1>
+              
+              <div className="space-y-8">
+                <section>
+                  <h2 className="text-lg font-semibold mb-3">Contexto</h2>
+                  <p className="text-gray-600">{mvpDetails.description}</p>
+                </section>
 
-              <section>
-                <h2 className="text-lg font-semibold mb-3">Instruções</h2>
-                <div className="text-gray-600 whitespace-pre-line">
-                  {mvpDetails.instructions}
-                </div>
-              </section>
+                {mvpDetails.instructions && (
+                  <section>
+                    <h2 className="text-lg font-semibold mb-3">Instruções</h2>
+                    <div className="text-gray-600 whitespace-pre-line">
+                      {mvpDetails.instructions}
+                    </div>
+                  </section>
+                )}
 
-              <section>
-                <h2 className="text-lg font-semibold mb-3">Limitações</h2>
-                <div className="text-gray-600 whitespace-pre-line">
-                  {mvpDetails.limitations}
-                </div>
-              </section>
+                {mvpDetails.limitations && (
+                  <section>
+                    <h2 className="text-lg font-semibold mb-3">Limitações</h2>
+                    <div className="text-gray-600 whitespace-pre-line">
+                      {mvpDetails.limitations}
+                    </div>
+                  </section>
+                )}
 
-              <section>
-                <h2 className="text-lg font-semibold mb-3">Objetivos</h2>
-                <div className="text-gray-600 whitespace-pre-line">
-                  {mvpDetails.objectives}
-                </div>
-              </section>
+                {mvpDetails.test_objectives && (
+                  <section>
+                    <h2 className="text-lg font-semibold mb-3">Objetivos</h2>
+                    <div className="text-gray-600 whitespace-pre-line">
+                      {mvpDetails.test_objectives}
+                    </div>
+                  </section>
+                )}
 
-              <section>
-                <h2 className="text-lg font-semibold mb-3">Link para Teste</h2>
-                <Button 
-                  variant="outline" 
-                  className="w-full rounded-xl"
-                  onClick={handleAccessPrototype}
-                >
-                  Acessar Protótipo
-                  <ExternalLink className="w-4 h-4 ml-2" />
-                </Button>
-              </section>
+                {mvpDetails.mvp_url && (
+                  <section>
+                    <h2 className="text-lg font-semibold mb-3">Link para Teste</h2>
+                    <Button 
+                      variant="outline" 
+                      className="w-full rounded-xl"
+                      onClick={handleAccessPrototype}
+                    >
+                      Acessar Protótipo
+                      <ExternalLink className="w-4 h-4 ml-2" />
+                    </Button>
+                  </section>
+                )}
+              </div>
+            </Card>
+
+            <div className="flex justify-center">
+              <Button 
+                size="lg"
+                asChild
+                className="gap-2 rounded-xl"
+              >
+                <Link to={`/add-feedback/${id}`}>
+                  <MessageSquarePlus className="w-5 h-5" />
+                  Adicionar Feedback
+                </Link>
+              </Button>
             </div>
-          </Card>
-
-          <div className="flex justify-center">
-            <Button 
-              size="lg"
-              asChild
-              className="gap-2 rounded-xl"
-              onClick={() => {
-                toast({
-                  title: "Em breve!",
-                  description: "Funcionalidade de feedback estará disponível em breve."
-                });
-              }}
-            >
-              <Link to={`/add-feedback/${id}`}>
-                <MessageSquarePlus className="w-5 h-5" />
-                Adicionar Feedback
-              </Link>
-            </Button>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -1,21 +1,57 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, StarIcon, Send } from 'lucide-react';
+import { ArrowLeft, StarIcon, Send, Loader2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AddFeedback = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { user } = useAuth();
   const [rating, setRating] = useState<number>(0);
   const [hover, setHover] = useState<number | null>(null);
   const [feedback, setFeedback] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [mvpTitle, setMvpTitle] = useState('');
 
-  const handleSubmitFeedback = () => {
+  useEffect(() => {
+    const fetchMVPTitle = async () => {
+      if (!id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('mvps')
+          .select('title')
+          .eq('id', id)
+          .single();
+          
+        if (error) throw error;
+        if (data) setMvpTitle(data.title);
+      } catch (error) {
+        console.error('Error fetching MVP title:', error);
+      }
+    };
+    
+    fetchMVPTitle();
+  }, [id]);
+
+  const handleSubmitFeedback = async () => {
+    if (!user) {
+      toast({
+        title: "Erro",
+        description: "Você precisa estar logado para enviar feedback",
+        variant: "destructive"
+      });
+      navigate('/auth');
+      return;
+    }
+
     if (rating === 0) {
       toast({
         title: "Erro",
@@ -34,12 +70,36 @@ const AddFeedback = () => {
       return;
     }
 
-    toast({
-      title: "Feedback enviado!",
-      description: "Obrigado por avaliar este MVP",
-    });
-    
-    navigate(`/test-mvp/${id}`);
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase
+        .from('mvp_validations')
+        .insert({
+          mvp_id: id,
+          user_id: user.id,
+          rating,
+          feedback
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Feedback enviado!",
+        description: "Obrigado por avaliar este MVP",
+      });
+      
+      navigate(`/test-mvp/${id}`);
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível enviar seu feedback",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -47,7 +107,7 @@ const AddFeedback = () => {
       <div className="fixed top-0 left-0 p-4 z-50">
         <Button 
           variant="outline" 
-          className="bg-white/80 backdrop-blur-sm"
+          className="bg-white/80 backdrop-blur-sm rounded-xl"
           onClick={() => navigate(`/test-mvp/${id}`)}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -56,8 +116,9 @@ const AddFeedback = () => {
       </div>
 
       <div className="container max-w-2xl px-4 py-8">
-        <Card className="p-6">
-          <h1 className="text-2xl font-bold mb-6">Adicionar Feedback</h1>
+        <Card className="p-6 rounded-xl">
+          <h1 className="text-2xl font-bold mb-2">Adicionar Feedback</h1>
+          {mvpTitle && <p className="text-gray-600 mb-6">Para: {mvpTitle}</p>}
           
           <div className="space-y-6">
             <div>
@@ -92,7 +153,7 @@ const AddFeedback = () => {
               </label>
               <Textarea 
                 placeholder="Compartilhe sua experiência com este MVP..."
-                className="min-h-[150px]"
+                className="min-h-[150px] rounded-xl"
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
               />
@@ -106,7 +167,7 @@ const AddFeedback = () => {
                 type="file"
                 accept="image/*"
                 multiple
-                className="mb-2"
+                className="mb-2 rounded-xl"
               />
               <p className="text-sm text-gray-500">
                 Você pode anexar capturas de tela ou outras imagens para ilustrar seu feedback
@@ -115,10 +176,20 @@ const AddFeedback = () => {
 
             <Button 
               onClick={handleSubmitFeedback}
-              className="w-full"
+              className="w-full rounded-xl"
+              disabled={isSubmitting}
             >
-              <Send className="w-4 h-4 mr-2" />
-              Enviar Feedback
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Enviando...
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4 mr-2" />
+                  Enviar Feedback
+                </>
+              )}
             </Button>
           </div>
         </Card>
