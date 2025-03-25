@@ -18,7 +18,7 @@ const MVPLinkInput = ({ mvpUrl, setMvpUrl }: MVPLinkInputProps) => {
         placeholder="URL onde seu MVP está hospedado (ex: https://meu-mvp.com)"
         value={mvpUrl}
         onChange={(e) => setMvpUrl(e.target.value)}
-        className="rounded-xl"
+        className="rounded-xl h-11"
       />
       <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
         <p className="text-sm text-blue-700 mb-2">
