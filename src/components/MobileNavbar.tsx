@@ -54,14 +54,14 @@ const MobileNavbar = () => {
   }
 
   return (
-    <div className="fixed top-0 left-0 p-4 z-50">
+    <div className="fixed top-0 right-0 p-4 z-50">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="icon" className="bg-white shadow-sm backdrop-blur-sm rounded-full">
             <Menu className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-56 bg-white shadow-md border border-gray-100">
+        <DropdownMenuContent align="end" className="w-56 bg-white shadow-md border border-gray-100">
           <DropdownMenuLabel>Menu</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
