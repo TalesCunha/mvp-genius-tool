@@ -1,12 +1,14 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import AIFeedback from '@/components/AIFeedback';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 const data = [
   { name: 'Jan', rating: 4.2 },
@@ -38,6 +40,54 @@ const comments = [
 
 const MVPDetails = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const [mvpName, setMvpName] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchMVPName = async () => {
+      if (!id) return;
+
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from('mvps')
+          .select('title')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (error) {
+          throw error;
+        }
+
+        if (data) {
+          setMvpName(data.title);
+        }
+      } catch (error) {
+        console.error('Error fetching MVP name:', error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível carregar o nome do MVP",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMVPName();
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p>Carregando dados do MVP...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
@@ -55,7 +105,7 @@ const MVPDetails = () => {
       <div className="container px-4 py-8">
         <div className="space-y-6">
           <Card className="p-6">
-            <h1 className="text-2xl font-bold mb-6">App de Fitness Gamificado</h1>
+            <h1 className="text-2xl font-bold mb-6">{mvpName || 'MVP Detalhes'}</h1>
             
             <div>
               <h2 className="text-lg font-semibold mb-4">Avaliações ao Longo do Tempo</h2>
