@@ -17,18 +17,30 @@ const Logo: React.FC<LogoProps> = ({ size = 'md', showText = true }) => {
   const textSizes = {
     sm: 'text-lg',
     md: 'text-xl',
-    lg: 'text-2xl',
+    lg: 'text-3xl',
   };
 
   return (
-    <Link to="/" className="flex items-center gap-2">
-      <div className={`${sizes[size]} rounde-full bg-gradient-to-r from-accent via-accent/80 to-accent/60 rounded-xl flex items-center justify-center text-white font-bold ${textSizes[size]}`}>
-        GT
-      </div>
+    <Link to="/" className="flex flex-col items-center">
       {showText && (
-        <span className={`font-semibold ${textSizes[size]} bg-gradient-to-r from-accent to-accent/80 bg-clip-text text-transparent`}>
-          Global Test MVP
-        </span>
+        <div className="flex flex-col items-center">
+          <div className="h-1 w-full max-w-[320px] bg-primary mb-2"></div>
+          <div className="flex items-center gap-0">
+            <span className={`font-semibold ${textSizes[size]} text-primary`}>
+              Global<span className="font-light">Test</span>MVP
+            </span>
+          </div>
+          <div className="flex mt-2 w-full max-w-[320px] justify-between">
+            <div className="h-1 w-1/2 bg-primary"></div>
+            <div className="h-1 w-3/4 bg-accent"></div>
+          </div>
+          <div className="h-1 w-1/3 mt-1 bg-primary"></div>
+        </div>
+      )}
+      {!showText && (
+        <div className={`${sizes[size]} flex items-center justify-center text-white font-bold ${textSizes[size]} bg-primary rounded-xl`}>
+          GT
+        </div>
       )}
     </Link>
   );

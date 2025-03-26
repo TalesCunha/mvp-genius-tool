@@ -80,7 +80,7 @@ const MVPDetails = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <p>Carregando dados do MVP...</p>
@@ -90,11 +90,11 @@ const MVPDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16">
+    <div className="min-h-screen bg-white pt-16">
       <div className="fixed top-0 left-0 p-4 z-50">
         <Button 
           variant="outline" 
-          className="bg-white/80 backdrop-blur-sm"
+          className="bg-white/80 backdrop-blur-sm border-primary text-primary"
           onClick={() => navigate('/profile')}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -104,11 +104,11 @@ const MVPDetails = () => {
 
       <div className="container px-4 py-8">
         <div className="space-y-6">
-          <Card className="p-6">
-            <h1 className="text-2xl font-bold mb-6">{mvpName || 'MVP Detalhes'}</h1>
+          <Card className="p-6 border-primary/20">
+            <h1 className="text-2xl font-bold mb-6 text-primary">{mvpName || 'MVP Detalhes'}</h1>
             
             <div>
-              <h2 className="text-lg font-semibold mb-4">Avaliações ao Longo do Tempo</h2>
+              <h2 className="text-lg font-semibold mb-4 text-primary">Avaliações ao Longo do Tempo</h2>
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={data}>
@@ -119,9 +119,9 @@ const MVPDetails = () => {
                     <Line 
                       type="monotone" 
                       dataKey="rating" 
-                      stroke="#22c55e" 
+                      stroke="#D5B77C" 
                       strokeWidth={2}
-                      dot={{ fill: '#22c55e' }}
+                      dot={{ fill: '#D5B77C' }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -131,23 +131,23 @@ const MVPDetails = () => {
 
           <AIFeedback />
 
-          <Card className="p-6">
-            <h2 className="text-lg font-semibold mb-4">Feedbacks dos Usuários</h2>
+          <Card className="p-6 border-primary/20">
+            <h2 className="text-lg font-semibold mb-4 text-primary">Feedbacks dos Usuários</h2>
             <div className="space-y-4">
               {comments.map((comment) => (
-                <Card key={comment.id} className="p-4">
+                <Card key={comment.id} className="p-4 border-accent/20">
                   <div className="flex items-start gap-4">
                     <Avatar>
-                      <AvatarFallback>{comment.user[0]}</AvatarFallback>
+                      <AvatarFallback className="bg-primary text-white">{comment.user[0]}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium">{comment.user}</span>
+                        <span className="font-medium text-primary">{comment.user}</span>
                         <span className="text-sm text-gray-500">{comment.date}</span>
                       </div>
                       <p className="text-gray-600">{comment.comment}</p>
                       <div className="mt-2 flex items-center">
-                        <span className="text-sm text-gray-500">Avaliação: {comment.rating}/5</span>
+                        <span className="text-sm text-accent">Avaliação: {comment.rating}/5</span>
                       </div>
                     </div>
                   </div>

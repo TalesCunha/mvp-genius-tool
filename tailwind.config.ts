@@ -30,16 +30,16 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#171717",
+          DEFAULT: "#0B2D3D", // Navy blue from the image
           foreground: "#ffffff",
         },
         secondary: {
           DEFAULT: "#f5f5f5",
-          foreground: "#171717",
+          foreground: "#0B2D3D", // Navy blue from the image
         },
         accent: {
-          DEFAULT: "#22c55e",
-          foreground: "#ffffff",
+          DEFAULT: "#D5B77C", // Gold/Beige from the image
+          foreground: "#0B2D3D", // Navy blue for contrast
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -51,7 +51,7 @@ export default {
         },
         card: {
           DEFAULT: "#ffffff",
-          foreground: "#171717",
+          foreground: "#0B2D3D", // Navy blue from the image
         },
       },
       keyframes: {
